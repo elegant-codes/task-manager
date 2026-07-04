@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -132,6 +133,8 @@ export async function deleteTask(taskId: string, formData: FormData) {
 
 export async function getProjectMembers(projectId: string) {
   const supabase = await createClient();
+  const admin = createAdminClient();
+
   const { data, error } = await supabase
     .from("project_members")
     .select("user_id")
@@ -141,7 +144,9 @@ export async function getProjectMembers(projectId: string) {
 
   const userIds = data.map((m: { user_id: string }) => m.user_id);
 
-  const { data: profiles, error: profileError } = await supabase
+  if (userIds.length === 0) return [];
+
+  const { data: profiles, error: profileError } = await admin
     .from("profiles")
     .select("id, name, avatar_url")
     .in("id", userIds);

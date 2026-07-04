@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { TaskRow } from "@/actions/tasks";
 import { getProjectTasks, getProjectMembers } from "@/actions/tasks";
 import { TaskItem } from "@/components/tasks/task-item";
 import { KanbanBoard } from "@/components/tasks/kanban-board";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateTaskForm } from "@/components/tasks/create-task-form";
-import { useRealtimeTasks } from "@/hooks/use-realtime-tasks";
+import { useRealtimeTasks, useRealtimeTaskMembers } from "@/hooks/use-realtime-tasks";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -40,6 +40,15 @@ export function TaskList({
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchMembers = useCallback(async () => {
+    try {
+      const members = await getProjectMembers(projectId);
+      setMembers(members);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [projectId]);
+
   useEffect(() => {
     Promise.all([
       getProjectTasks(projectId),
@@ -54,6 +63,7 @@ export function TaskList({
   }, [projectId]);
 
   useRealtimeTasks(projectId, setTasks);
+  useRealtimeTaskMembers(projectId, fetchMembers);
 
   const filteredTasks = tasks.filter((task) => {
     if (filters.status && task.status !== filters.status) return false;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { TaskRow } from "@/actions/tasks";
 import { deleteTask, updateTask } from "@/actions/tasks";
 import { Badge } from "@/components/ui/badge";
@@ -41,20 +40,16 @@ export function TaskItem({
   projectSlug: string;
   members?: Member[];
 }) {
-  const [status, setStatus] = useState(task.status);
-
   const assigneeName = members.find((m) => m.id === task.assignee_id)?.name;
 
   async function handleStatusChange(newStatus: string | null) {
     if (!newStatus) return;
-    setStatus(newStatus as TaskRow["status"]);
     try {
       const formData = new FormData();
       formData.set("status", newStatus);
       formData.set("project_slug", projectSlug);
       await updateTask(task.id, formData);
     } catch {
-      setStatus(task.status);
       toast.error("Failed to update status");
     }
   }
@@ -101,7 +96,7 @@ export function TaskItem({
         </div>
       </div>
 
-      <Select value={status} onValueChange={handleStatusChange}>
+      <Select value={task.status} onValueChange={handleStatusChange}>
         <SelectTrigger className="w-28 h-7 text-xs">
           <SelectValue />
         </SelectTrigger>

@@ -6,6 +6,35 @@ import type { TaskRow } from "@/actions/tasks";
 
 type Setter = React.Dispatch<React.SetStateAction<TaskRow[]>>;
 
+export function useRealtimeTaskMembers(
+  projectId: string,
+  onMemberChange: () => void
+) {
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`task-members:${projectId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "project_members",
+          filter: `project_id=eq.${projectId}`,
+        },
+        () => {
+          onMemberChange();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [projectId, onMemberChange]);
+}
+
 export function useRealtimeTasks(projectId: string, setTasks: Setter) {
   useEffect(() => {
     const supabase = createClient();

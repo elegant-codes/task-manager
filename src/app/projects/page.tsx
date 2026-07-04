@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import { getUserProjects, type Project } from "@/actions/projects";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,

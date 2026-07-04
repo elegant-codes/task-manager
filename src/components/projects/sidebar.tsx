@@ -19,11 +19,33 @@ export function Sidebar() {
     const supabase = createClient();
 
     supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+
       if (user?.user_metadata?.name) {
         setUserName(user.user_metadata.name);
       } else if (user?.email) {
         setUserName(user.email);
       }
+
+      const channel = supabase
+        .channel(`sidebar:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "project_members",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            getUserProjects().then(setProjects).catch(console.error);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     });
 
     getUserProjects().then(setProjects).catch(console.error);
