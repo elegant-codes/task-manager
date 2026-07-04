@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from "@dnd-kit/core";
 import type { TaskRow } from "@/actions/tasks";
 import { getProjectTasks, updateTask } from "@/actions/tasks";
@@ -21,6 +21,10 @@ export function KanbanBoard({
 }) {
   const [tasks, setTasks] = useState<TaskRow[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<TaskRow | null>(null);
+
+  useEffect(() => {
+    setTasks(initialTasks);
+  }, [initialTasks]);
 
   async function refreshTasks() {
     try {
