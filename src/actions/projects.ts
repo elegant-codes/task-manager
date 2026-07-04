@@ -89,6 +89,29 @@ export async function getProjectBySlug(slug: string) {
   return data as Project;
 }
 
+export async function inviteProjectMember(projectId: string, email: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data, error } = await supabase.rpc("add_project_member_by_email", {
+    p_project_id: projectId,
+    p_email: email,
+    p_role: "member",
+  });
+
+  if (error) throw new Error(error.message);
+
+  const result = data as { success: boolean; error?: string; user_id?: string; name?: string };
+
+  if (!result.success) {
+    throw new Error(result.error || "Failed to invite member");
+  }
+
+  revalidatePath("/projects", "layout");
+  return result;
+}
+
 function slugify(text: string): string {
   return text
     .toLowerCase()

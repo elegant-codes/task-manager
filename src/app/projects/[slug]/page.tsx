@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { TaskList } from "@/components/tasks/task-list";
 import { TaskFilters } from "@/components/tasks/task-filters";
+import { InviteMemberDialog } from "@/components/projects/invite-member-dialog";
 
 export default async function ProjectPage({
   params,
@@ -23,7 +24,10 @@ export default async function ProjectPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">{project.name}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">{project.name}</h1>
+        <InviteMemberDialog projectId={project.id} />
+      </div>
       <Suspense fallback={null}>
         <TaskFilters />
       </Suspense>
