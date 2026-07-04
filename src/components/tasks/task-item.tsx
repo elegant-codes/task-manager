@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { TaskRow } from "@/actions/tasks";
 import { deleteTask, updateTask } from "@/actions/tasks";
 import { Badge } from "@/components/ui/badge";
@@ -18,17 +17,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, User } from "lucide-react";
 import { toast } from "sonner";
-
-const statusColors: Record<string, string> = {
-  backlog: "bg-muted text-muted-foreground",
-  todo: "bg-blue-500/10 text-blue-500",
-  in_progress: "bg-amber-500/10 text-amber-500",
-  done: "bg-green-500/10 text-green-500",
-  archived: "bg-muted text-muted-foreground",
-};
 
 const priorityColors: Record<string, string> = {
   none: "",
@@ -38,15 +30,20 @@ const priorityColors: Record<string, string> = {
   urgent: "bg-red-500/10 text-red-400",
 };
 
+type Member = { id: string; name: string };
+
 export function TaskItem({
   task,
   projectSlug,
+  members = [],
 }: {
   task: TaskRow;
   projectSlug: string;
+  members?: Member[];
 }) {
-  const router = useRouter();
   const [status, setStatus] = useState(task.status);
+
+  const assigneeName = members.find((m) => m.id === task.assignee_id)?.name;
 
   async function handleStatusChange(newStatus: string | null) {
     if (!newStatus) return;
@@ -62,13 +59,25 @@ export function TaskItem({
     }
   }
 
+  async function handleAssign(userId: string) {
+    try {
+      const formData = new FormData();
+      formData.set("assignee_id", userId || "");
+      formData.set("project_slug", projectSlug);
+      await updateTask(task.id, formData);
+      toast.success(userId ? "Task assigned" : "Task unassigned");
+    } catch {
+      toast.error("Failed to assign task");
+    }
+  }
+
   async function handleDelete() {
     try {
       const formData = new FormData();
       formData.set("project_slug", projectSlug);
       await deleteTask(task.id, formData);
       toast.success("Task deleted");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete task");
     }
   }
@@ -77,11 +86,20 @@ export function TaskItem({
     <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{task.title}</p>
+        <div className="flex items-center gap-2 mt-1">
+          {task.priority !== "none" && (
+            <Badge className={priorityColors[task.priority]} variant="secondary">
+              {task.priority}
+            </Badge>
+          )}
+          {assigneeName && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <User className="h-3 w-3" />
+              {assigneeName}
+            </span>
+          )}
+        </div>
       </div>
-
-      <Badge className={priorityColors[task.priority]} variant="secondary">
-        {task.priority}
-      </Badge>
 
       <Select value={status} onValueChange={handleStatusChange}>
         <SelectTrigger className="w-28 h-7 text-xs">
@@ -103,6 +121,27 @@ export function TaskItem({
           <MoreHorizontal className="h-4 w-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          {members.length > 0 && (
+            <>
+              <DropdownMenuItem
+                onClick={() => handleAssign("")}
+                disabled={!task.assignee_id}
+              >
+                <User className="h-4 w-4 mr-2" />
+                Unassign
+              </DropdownMenuItem>
+              {members.map((m) => (
+                <DropdownMenuItem
+                  key={m.id}
+                  onClick={() => handleAssign(m.id)}
+                  disabled={m.id === task.assignee_id}
+                >
+                  Assign to {m.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem onClick={handleDelete} className="text-destructive">
             <Trash2 className="h-4 w-4 mr-2" />
             Delete
