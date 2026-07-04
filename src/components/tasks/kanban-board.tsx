@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from "@dnd-kit/core";
 import type { TaskRow } from "@/actions/tasks";
-import { getProjectTasks, updateTask } from "@/actions/tasks";
+import { updateTask } from "@/actions/tasks";
 import { KanbanColumn } from "@/components/tasks/kanban-column";
 import { KanbanCard } from "@/components/tasks/kanban-card";
 import { toast } from "sonner";
@@ -11,29 +11,15 @@ import { toast } from "sonner";
 const COLUMNS = ["todo", "in_progress", "done"];
 
 export function KanbanBoard({
-  initialTasks,
-  projectId,
+  tasks,
+  setTasks,
   projectSlug,
 }: {
-  initialTasks: TaskRow[];
-  projectId: string;
+  tasks: TaskRow[];
+  setTasks: (tasks: TaskRow[] | ((prev: TaskRow[]) => TaskRow[])) => void;
   projectSlug: string;
 }) {
-  const [tasks, setTasks] = useState<TaskRow[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<TaskRow | null>(null);
-
-  useEffect(() => {
-    setTasks(initialTasks);
-  }, [initialTasks]);
-
-  async function refreshTasks() {
-    try {
-      const updated = await getProjectTasks(projectId);
-      setTasks(updated);
-    } catch {
-      // silent fallback
-    }
-  }
 
   function handleDragStart(event: DragStartEvent) {
     const taskId = event.active.id as string;
@@ -65,7 +51,6 @@ export function KanbanBoard({
       await updateTask(taskId, formData);
     } catch {
       toast.error("Failed to update task status");
-      refreshTasks();
     }
   }
 

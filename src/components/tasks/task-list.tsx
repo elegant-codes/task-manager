@@ -114,8 +114,8 @@ export function TaskList({
           </p>
         ) : (
           <KanbanBoard
-            initialTasks={tasks}
-            projectId={projectId}
+            tasks={tasks}
+            setTasks={setTasks}
             projectSlug={projectSlug}
           />
         )
