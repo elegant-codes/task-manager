@@ -138,7 +138,8 @@ export async function getProjectMembers(projectId: string) {
   const { data, error } = await supabase
     .from("project_members")
     .select("user_id")
-    .eq("project_id", projectId);
+    .eq("project_id", projectId)
+    .eq("status", "active");
 
   if (error) throw new Error(error.message);
 

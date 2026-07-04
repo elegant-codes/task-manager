@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProjects, type Project } from "@/actions/projects";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
@@ -17,9 +18,11 @@ export function Sidebar() {
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
+    const channels: RealtimeChannel[] = [];
 
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      if (!user || cancelled) return;
 
       if (user?.user_metadata?.name) {
         setUserName(user.user_metadata.name);
@@ -41,14 +44,29 @@ export function Sidebar() {
             getUserProjects().then(setProjects).catch(console.error);
           }
         )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "project_members",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            getUserProjects().then(setProjects).catch(console.error);
+          }
+        )
         .subscribe();
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
+      channels.push(channel);
     });
 
     getUserProjects().then(setProjects).catch(console.error);
+
+    return () => {
+      cancelled = true;
+      channels.forEach((ch) => supabase.removeChannel(ch));
+    };
   }, [pathname]);
 
   async function handleSignOut() {
@@ -75,6 +93,14 @@ export function Sidebar() {
           }`}
         >
           All projects
+        </Link>
+        <Link
+          href="/projects/invitations"
+          className={`block px-3 py-2 rounded-md text-sm transition-colors ${
+            pathname === "/projects/invitations" ? "bg-secondary text-secondary-foreground" : "hover:bg-secondary"
+          }`}
+        >
+          Invitations
         </Link>
 
         {projects.map((project) => (

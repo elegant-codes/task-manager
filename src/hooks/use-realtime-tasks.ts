@@ -27,6 +27,18 @@ export function useRealtimeTaskMembers(
           onMemberChange();
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "project_members",
+          filter: `project_id=eq.${projectId}`,
+        },
+        () => {
+          onMemberChange();
+        }
+      )
       .subscribe();
 
     return () => {

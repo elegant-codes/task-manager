@@ -139,6 +139,7 @@ export async function inviteProjectMember(projectId: string, email: string) {
       project_id: projectId,
       user_id: invitedUser.id,
       role: "member",
+      status: "pending",
     });
 
   if (memberError) throw new Error("Failed to add member");
@@ -147,8 +148,73 @@ export async function inviteProjectMember(projectId: string, email: string) {
   return {
     success: true,
     user_id: invitedUser.id,
-    name: invitedUser.user_metadata?.name || email.split("@")[0],
+    name: invitedUser.user_metadata?.name || email.split("@")[1],
   };
+}
+
+export type PendingInvitation = {
+  id: string;
+  project_id: string;
+  project_name: string;
+  project_slug: string;
+};
+
+export async function getPendingInvitations() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const admin = createAdminClient();
+
+  const { data, error } = await admin
+    .from("project_members")
+    .select("id, project_id, projects!inner(name, slug)")
+    .eq("user_id", user.id)
+    .eq("status", "pending");
+
+  if (error) throw new Error(error.message);
+
+  return (data || []).map((item: Record<string, unknown>) => {
+    const project = item.projects as { name: string; slug: string };
+    return {
+      id: item.id as string,
+      project_id: item.project_id as string,
+      project_name: project.name,
+      project_slug: project.slug,
+    } satisfies PendingInvitation;
+  });
+}
+
+export async function respondToInvitation(
+  invitationId: string,
+  action: "accept" | "decline"
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  if (action === "accept") {
+    const { error } = await supabase
+      .from("project_members")
+      .update({ status: "active" })
+      .eq("id", invitationId)
+      .eq("user_id", user.id);
+
+    if (error) throw new Error("Failed to accept invitation");
+
+    revalidatePath("/projects", "layout");
+    revalidatePath("/invitations");
+  } else {
+    const { error } = await supabase
+      .from("project_members")
+      .update({ status: "declined" })
+      .eq("id", invitationId)
+      .eq("user_id", user.id);
+
+    if (error) throw new Error("Failed to decline invitation");
+
+    revalidatePath("/invitations");
+  }
 }
 
 function slugify(text: string): string {
