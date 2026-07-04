@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -94,22 +95,45 @@ export async function inviteProjectMember(projectId: string, email: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data, error } = await supabase.rpc("add_project_member_by_email", {
-    p_project_id: projectId,
-    p_email: email,
-    p_role: "member",
-  });
+  const admin = createAdminClient();
 
-  if (error) throw new Error(error.message);
+  const { data: users, error: lookupError } = await admin.auth.admin.listUsers();
 
-  const result = data as { success: boolean; error?: string; user_id?: string; name?: string };
+  if (lookupError) throw new Error("Failed to look up user");
 
-  if (!result.success) {
-    throw new Error(result.error || "Failed to invite member");
+  const invitedUser = users.users.find((u) => u.email === email);
+
+  if (!invitedUser) {
+    throw new Error("User with this email not found");
   }
 
+  const { data: existing } = await supabase
+    .from("project_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("user_id", invitedUser.id)
+    .maybeSingle();
+
+  if (existing) {
+    throw new Error("User is already a member");
+  }
+
+  const { error: memberError } = await supabase
+    .from("project_members")
+    .insert({
+      project_id: projectId,
+      user_id: invitedUser.id,
+      role: "member",
+    });
+
+  if (memberError) throw new Error("Failed to add member");
+
   revalidatePath("/projects", "layout");
-  return result;
+  return {
+    success: true,
+    user_id: invitedUser.id,
+    name: invitedUser.user_metadata?.name || email.split("@")[0],
+  };
 }
 
 function slugify(text: string): string {
