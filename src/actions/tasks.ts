@@ -94,7 +94,9 @@ export async function updateTask(taskId: string, formData: FormData) {
   if (title) updates.title = title;
   if (status) updates.status = status;
   if (priority) updates.priority = priority;
-  if (assigneeId !== null) updates.assignee_id = assigneeId;
+  if (assigneeId !== null) {
+    updates.assignee_id = assigneeId || null;
+  }
 
   const parsed = updateTaskSchema.parse(updates);
 

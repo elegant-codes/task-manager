@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay } from "@dnd-kit/core";
 import type { TaskRow } from "@/actions/tasks";
 import { getProjectTasks, updateTask } from "@/actions/tasks";
 import { KanbanColumn } from "@/components/tasks/kanban-column";
@@ -31,7 +31,7 @@ export function KanbanBoard({
     }
   }
 
-  function handleDragStart(event: DragEndEvent) {
+  function handleDragStart(event: DragStartEvent) {
     const taskId = event.active.id as string;
     const task = tasks.find((t) => t.id === taskId);
     if (task) setActiveTask(task);

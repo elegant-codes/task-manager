@@ -35,11 +35,22 @@ export async function createProject(formData: FormData) {
     slug: slugify(formData.get("name") as string),
   });
 
+  let finalSlug = parsed.slug;
+
+  const { count } = await supabase
+    .from("projects")
+    .select("*", { count: "exact", head: true })
+    .eq("slug", finalSlug);
+
+  if (count && count > 0) {
+    finalSlug = `${parsed.slug}-${Date.now().toString(36)}`;
+  }
+
   const { data: project, error: projectError } = await supabase
     .from("projects")
     .insert({
       name: parsed.name,
-      slug: parsed.slug,
+      slug: finalSlug,
       created_by: user.id,
     })
     .select()
@@ -105,6 +116,10 @@ export async function inviteProjectMember(projectId: string, email: string) {
 
   if (!invitedUser) {
     throw new Error("User with this email not found");
+  }
+
+  if (invitedUser.id === user.id) {
+    throw new Error("You are already a member of this project");
   }
 
   const { data: existing } = await supabase
