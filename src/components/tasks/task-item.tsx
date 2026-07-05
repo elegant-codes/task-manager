@@ -2,8 +2,9 @@
 
 import type { TaskRow } from "@/actions/tasks";
 import { deleteTask, updateTask } from "@/actions/tasks";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -21,15 +22,22 @@ import {
 import { MoreHorizontal, Trash2, User } from "lucide-react";
 import { toast } from "sonner";
 
-const priorityColors: Record<string, string> = {
-  none: "",
-  low: "bg-gray-500/10 text-gray-400",
-  medium: "bg-blue-500/10 text-blue-400",
-  high: "bg-orange-500/10 text-orange-400",
-  urgent: "bg-red-500/10 text-red-400",
-};
-
 type Member = { id: string; name: string };
+
+function PriorityDot({ priority }: { priority: string }) {
+  const colors: Record<string, string> = {
+    urgent: "bg-priority-urgent",
+    high: "bg-priority-high",
+    medium: "bg-priority-medium",
+    low: "bg-priority-low",
+  };
+  if (priority === "none") return null;
+  return (
+    <span
+      className={`h-2 w-2 rounded-full ${colors[priority] ?? "bg-muted-foreground"}`}
+    />
+  );
+}
 
 export function TaskItem({
   task,
@@ -40,7 +48,7 @@ export function TaskItem({
   projectSlug: string;
   members?: Member[];
 }) {
-  const assigneeName = members.find((m) => m.id === task.assignee_id)?.name;
+  const assignee = members.find((m) => m.id === task.assignee_id);
 
   async function handleStatusChange(newStatus: string | null) {
     if (!newStatus) return;
@@ -78,71 +86,89 @@ export function TaskItem({
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+    <div className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 transition-all duration-150 hover:shadow-elevated hover:-translate-y-0.5">
+      <PriorityDot priority={task.priority} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{task.title}</p>
-        <div className="flex items-center gap-2 mt-1">
-          {task.priority !== "none" && (
-            <Badge className={priorityColors[task.priority]} variant="secondary">
-              {task.priority}
-            </Badge>
-          )}
-          {assigneeName && (
+        <p className="text-sm font-medium text-card-foreground truncate">
+          {task.title}
+        </p>
+        <div className="flex items-center gap-2 mt-1.5">
+          <StatusBadge status={task.status} />
+          {assignee && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <User className="h-3 w-3" />
-              {assigneeName}
+              {assignee.name}
             </span>
           )}
         </div>
       </div>
 
-      <Select value={task.status} onValueChange={handleStatusChange}>
-        <SelectTrigger className="w-28 h-7 text-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="backlog">Backlog</SelectItem>
-          <SelectItem value="todo">To Do</SelectItem>
-          <SelectItem value="in_progress">In Progress</SelectItem>
-          <SelectItem value="done">Done</SelectItem>
-          <SelectItem value="archived">Archived</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        {assignee ? (
+          <Avatar className="h-7 w-7 ring-2 ring-border">
+            <AvatarFallback className="text-[10px] bg-secondary text-muted-foreground">
+              {assignee.name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        ) : (
+          <Avatar className="h-7 w-7 ring-2 ring-border opacity-50">
+            <AvatarFallback className="text-[10px] bg-secondary text-muted-foreground">
+              <User className="h-3 w-3" />
+            </AvatarFallback>
+          </Avatar>
+        )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={<Button variant="ghost" size="icon" className="h-8 w-8" />}
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {members.length > 0 && (
-            <>
-              <DropdownMenuItem
-                onClick={() => handleAssign("")}
-                disabled={!task.assignee_id}
-              >
-                <User className="h-4 w-4 mr-2" />
-                Unassign
-              </DropdownMenuItem>
-              {members.map((m) => (
+        <Select value={task.status} onValueChange={handleStatusChange}>
+          <SelectTrigger className="w-28 h-7 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="backlog">Backlog</SelectItem>
+            <SelectItem value="todo">To Do</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="archived">Archived</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={<Button variant="ghost" size="icon" className="h-7 w-7" />}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {members.length > 0 && (
+              <>
                 <DropdownMenuItem
-                  key={m.id}
-                  onClick={() => handleAssign(m.id)}
-                  disabled={m.id === task.assignee_id}
+                  onClick={() => handleAssign("")}
+                  disabled={!task.assignee_id}
                 >
-                  Assign to {m.name}
+                  <User className="h-4 w-4 mr-2" />
+                  Unassign
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-            </>
-          )}
-          <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+                {members.map((m) => (
+                  <DropdownMenuItem
+                    key={m.id}
+                    onClick={() => handleAssign(m.id)}
+                    disabled={m.id === task.assignee_id}
+                  >
+                    Assign to {m.name}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

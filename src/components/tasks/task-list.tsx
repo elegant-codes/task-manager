@@ -119,22 +119,106 @@ export function TaskList({
 
       {filters.view === "board" ? (
         tasks.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No tasks yet. Create one above.
-          </p>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 48 48"
+              fill="none"
+              className="mb-4 text-muted-foreground"
+            >
+              <rect
+                x="6"
+                y="8"
+                width="36"
+                height="32"
+                rx="3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                fill="none"
+              />
+              <path
+                d="M6 16h36M16 8v32"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                opacity="0.3"
+              />
+              <circle cx="36" cy="36" r="8" fill="var(--color-primary)" opacity="0.12" />
+              <path
+                d="M33 36h6M36 33v6"
+                stroke="var(--color-primary)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            <p className="text-sm text-muted-foreground">
+              No tasks yet. Create one above.
+            </p>
+          </div>
         ) : (
           <KanbanBoard
             tasks={tasks}
             setTasks={setTasks}
             projectSlug={projectSlug}
+            members={members}
           />
         )
       ) : filteredTasks.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">
-          {tasks.length === 0
-            ? "No tasks yet. Create one above."
-            : "No tasks match the current filters."}
-        </p>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            className="mb-4 text-muted-foreground"
+          >
+            {tasks.length === 0 ? (
+              <>
+                <rect
+                  x="8"
+                  y="10"
+                  width="32"
+                  height="28"
+                  rx="3"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  fill="none"
+                />
+                <path
+                  d="M16 20h16M16 27h12M16 34h8"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  opacity="0.4"
+                />
+                <circle cx="36" cy="36" r="8" fill="var(--color-primary)" opacity="0.12" />
+                <path
+                  d="M33 36h6M36 33v6"
+                  stroke="var(--color-primary)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </>
+            ) : (
+              <>
+                <circle cx="24" cy="24" r="14" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                <path
+                  d="M24 18v6l4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  opacity="0.5"
+                />
+                <path d="M14 14l20 20" stroke="currentColor" strokeWidth="1.5" opacity="0.2" />
+              </>
+            )}
+          </svg>
+          <p className="text-sm text-muted-foreground">
+            {tasks.length === 0
+              ? "No tasks yet. Create one above."
+              : "No tasks match the current filters."}
+          </p>
+        </div>
       ) : (
         <div className="space-y-2">
           {filteredTasks.map((task) => (

@@ -1,36 +1,66 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: hsl(0 0% 3.9%);
-  --color-foreground: hsl(0 0% 98%);
-  --color-card: hsl(0 0% 9%);
-  --color-card-foreground: hsl(0 0% 98%);
-  --color-popover: hsl(0 0% 9%);
-  --color-popover-foreground: hsl(0 0% 98%);
-  --color-primary: hsl(0 0% 98%);
-  --color-primary-foreground: hsl(0 0% 9%);
-  --color-secondary: hsl(0 0% 14.9%);
-  --color-secondary-foreground: hsl(0 0% 98%);
-  --color-muted: hsl(0 0% 14.9%);
-  --color-muted-foreground: hsl(0 0% 63.9%);
-  --color-accent: hsl(0 0% 14.9%);
-  --color-accent-foreground: hsl(0 0% 98%);
-  --color-destructive: hsl(0 62.8% 30.6%);
-  --color-destructive-foreground: hsl(0 0% 98%);
-  --color-border: hsl(0 0% 14.9%);
-  --color-input: hsl(0 0% 14.9%);
-  --color-ring: hsl(0 0% 83.1%);
+  --color-background: #1D2125;
+  --color-foreground: #B6C2CF;
+  --color-card: #282E33;
+  --color-card-foreground: #DEE4EA;
+  --color-popover: #282E33;
+  --color-popover-foreground: #DEE4EA;
+  --color-primary: #579DFF;
+  --color-primary-foreground: #1D2125;
+  --color-secondary: #323940;
+  --color-secondary-foreground: #B6C2CF;
+  --color-muted: #323940;
+  --color-muted-foreground: #8C9BAB;
+  --color-accent: #323940;
+  --color-accent-foreground: #DEE4EA;
+  --color-destructive: #EF5C48;
+  --color-destructive-foreground: #1D2125;
+  --color-border: #3D454C;
+  --color-input: #3D454C;
+  --color-ring: #579DFF;
   --radius: 0.5rem;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-* {
-  border-color: hsl(0 0% 14.9%);
+  --color-brand: #579DFF;
+  --color-brand-hover: #85B8FF;
+
+  --color-status-backlog: #8C9BAB;
+  --color-status-todo: #579DFF;
+  --color-status-in-progress: #E56910;
+  --color-status-done: #2ABB7F;
+  --color-status-archived: #596773;
+
+  --color-priority-urgent: #EF5C48;
+  --color-priority-high: #E56910;
+  --color-priority-medium: #579DFF;
+  --color-priority-low: #8C9BAB;
+
+  --shadow-atlassian-sm: 0 1px 1px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.2);
+  --shadow-atlassian-md: 0 4px 8px -2px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.25);
+  --shadow-atlassian-lg: 0 8px 16px -4px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
-  background: hsl(0 0% 3.9%);
-  color: hsl(0 0% 98%);
+  background: #1D2125;
+  color: #B6C2CF;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: 0 1px 1px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.2);
+  }
+  .shadow-elevated {
+    box-shadow: 0 4px 8px -2px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .shadow-overlay {
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2);
+  }
 }

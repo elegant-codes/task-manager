@@ -10,14 +10,18 @@ import { toast } from "sonner";
 
 const COLUMNS = ["todo", "in_progress", "done"];
 
+type Member = { id: string; name: string };
+
 export function KanbanBoard({
   tasks,
   setTasks,
   projectSlug,
+  members = [],
 }: {
   tasks: TaskRow[];
   setTasks: (tasks: TaskRow[] | ((prev: TaskRow[]) => TaskRow[])) => void;
   projectSlug: string;
+  members?: Member[];
 }) {
   const [activeTask, setActiveTask] = useState<TaskRow | null>(null);
 
@@ -67,11 +71,12 @@ export function KanbanBoard({
             key={status}
             status={status}
             tasks={tasksByStatus[status] || []}
+            members={members}
           />
         ))}
       </div>
       <DragOverlay>
-        {activeTask ? <KanbanCard task={activeTask} /> : null}
+        {activeTask ? <KanbanCard task={activeTask} members={members} /> : null}
       </DragOverlay>
     </DndContext>
   );

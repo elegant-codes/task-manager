@@ -41,8 +41,42 @@ export default function ProjectsPage() {
   if (projects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-        <h1 className="text-2xl font-bold mb-2">Welcome to Task Manager</h1>
-        <p className="text-muted-foreground mb-6">
+        <svg
+          width="64"
+          height="64"
+          viewBox="0 0 64 64"
+          fill="none"
+          className="mb-6 text-muted-foreground"
+        >
+          <rect
+            x="8"
+            y="12"
+            width="48"
+            height="40"
+            rx="4"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+          />
+          <path
+            d="M20 26h24M20 34h16M20 42h8"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
+          <circle cx="48" cy="48" r="12" fill="var(--color-primary)" opacity="0.15" />
+          <path
+            d="M44 48h8M48 44v8"
+            stroke="var(--color-primary)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+        <h1 className="text-xl font-semibold text-card-foreground mb-1">
+          Welcome to Task Manager
+        </h1>
+        <p className="text-sm text-muted-foreground mb-6 max-w-xs">
           Create your first project to get started.
         </p>
       </div>
@@ -55,9 +89,9 @@ export default function ProjectsPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Link key={project.id} href={`/projects/${project.slug}`}>
-            <Card className="hover:bg-card/80 transition-colors cursor-pointer">
+            <Card className="transition-all duration-150 hover:shadow-elevated hover:-translate-y-0.5 cursor-pointer">
               <CardHeader>
-                <CardTitle>{project.name}</CardTitle>
+                <CardTitle className="text-card-foreground">{project.name}</CardTitle>
                 <CardDescription>
                   Created {new Date(project.created_at).toLocaleDateString()}
                 </CardDescription>
