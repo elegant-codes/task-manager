@@ -1,6 +1,19 @@
 # Task Manager
 
-A collaborative task management application built with Next.js, Supabase, and TypeScript.
+A collaborative task management application with real-time sync, Kanban boards, and team collaboration. Built with Next.js, Supabase, and TypeScript.
+
+**Live Demo → [task-manager-beta-three-39.vercel.app](https://task-manager-beta-three-39.vercel.app)**
+
+## How to Use
+
+1. **Sign up** at the live link using your email and a password (no confirmation needed for now).
+2. **Create a project** using the sidebar button — you're automatically the admin.
+3. **Invite teammates** by clicking the **Invite** button on any project page — enter their email (they must already have an account).
+4. **Create tasks** with title, priority (optional), and assignee — they sync in real-time across all users.
+5. **Drag tasks** between columns on the Kanban board, or use list view to filter by status/priority.
+6. **Toggle dark/light mode** using the sun/moon icon in the sidebar.
+
+> **Note:** Invited users see pending invitations on the **Invitations** page (linked in the sidebar) and can accept or decline.
 
 ## Tech Stack
 
@@ -22,6 +35,8 @@ A collaborative task management application built with Next.js, Supabase, and Ty
 - Kanban board with drag-and-drop
 - URL-based task filtering (status, priority)
 - Real-time sync across users
+- Invite members by email (accept/decline flow)
+- Dark/light mode
 - Responsive design (mobile + desktop)
 
 ## Getting Started
@@ -46,8 +61,8 @@ A collaborative task management application built with Next.js, Supabase, and Ty
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
    ```
 6. Run the schema in Supabase SQL Editor (see `supabase-schema.sql`)
-7. Enable Realtime on the `tasks` table:
-   - Supabase Dashboard → Database → Replication → Enable replication for `tasks`
+7. Enable Realtime on the `tasks` and `project_members` tables:
+   - Supabase Dashboard → Database → Replication → Enable replication for both tables
 8. Start the dev server:
    ```bash
    npm run dev
@@ -64,12 +79,12 @@ A collaborative task management application built with Next.js, Supabase, and Ty
 src/
 ├── app/
 │   ├── (auth)/          # Login/signup pages
-│   ├── projects/        # Project pages
+│   ├── projects/        # Project pages + invitations
 │   └── auth/confirm/    # Email verification
 ├── components/
 │   ├── projects/        # Project sidebar, mobile nav
 │   ├── tasks/           # Task list, kanban board, filters
-│   └── ui/              # shadcn/ui components
+│   └── ui/              # shadcn/ui + custom components
 ├── hooks/               # Custom React hooks
 ├── lib/supabase/        # Supabase client utilities
 └── actions/             # Server Actions
@@ -81,5 +96,5 @@ Deploy to [Vercel](https://vercel.com):
 
 1. Push to GitHub
 2. Import repo in Vercel
-3. Add environment variables
+3. Add environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SERVICE_ROLE_KEY`)
 4. Deploy

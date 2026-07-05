@@ -8,7 +8,7 @@ import { KanbanColumn } from "@/components/tasks/kanban-column";
 import { KanbanCard } from "@/components/tasks/kanban-card";
 import { toast } from "sonner";
 
-const COLUMNS = ["todo", "in_progress", "done"];
+const COLUMNS = ["backlog", "todo", "in_progress", "done", "archived"];
 
 type Member = { id: string; name: string };
 
@@ -65,7 +65,7 @@ export function KanbanBoard({
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-board">
         {COLUMNS.map((status) => (
           <KanbanColumn
             key={status}
@@ -75,8 +75,8 @@ export function KanbanBoard({
           />
         ))}
       </div>
-      <DragOverlay>
-        {activeTask ? <KanbanCard task={activeTask} members={members} /> : null}
+      <DragOverlay dropAnimation={null}>
+        {activeTask ? <KanbanCard task={activeTask} members={members} isOverlay={true} /> : null}
       </DragOverlay>
     </DndContext>
   );

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
 import { getUserProjects, type Project } from "@/actions/projects";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
-import { Menu } from "lucide-react";
+import { Menu, Sun, Moon } from "lucide-react";
 
 export function MobileNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [projects, setProjects] = useState<Project[]>([]);
   const [userName, setUserName] = useState("");
   const [open, setOpen] = useState(false);
@@ -137,9 +139,22 @@ export function MobileNav() {
         <Separator />
         <div className="p-2 space-y-2">
           <CreateProjectDialog />
-          <Button variant="ghost" className="w-full justify-start" onClick={handleSignOut}>
-            Sign out
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" className="flex-1 justify-start" onClick={handleSignOut}>
+              Sign out
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0 text-muted-foreground hover:text-card-foreground"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title="Toggle theme"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

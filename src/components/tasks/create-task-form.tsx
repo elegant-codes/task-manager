@@ -26,6 +26,7 @@ export function CreateTaskForm({
 }) {
   const [title, setTitle] = useState("");
   const [assigneeId, setAssigneeId] = useState("");
+  const [priority, setPriority] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -39,9 +40,11 @@ export function CreateTaskForm({
       formData.set("project_id", projectId);
       formData.set("project_slug", projectSlug);
       if (assigneeId) formData.set("assignee_id", assigneeId);
+      if (priority) formData.set("priority", priority);
       await createTask(formData);
       setTitle("");
       setAssigneeId("");
+      setPriority("");
       toast.success("Task created");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create task");
@@ -53,12 +56,24 @@ export function CreateTaskForm({
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 flex-wrap">
       <Input
-        placeholder="Add a task..."
+        placeholder="Add a task... (press Enter)"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         disabled={loading}
-        className="flex-1 min-w-[200px]"
+        className="flex-1 min-w-[200px] focus-visible:ring-2 focus-visible:ring-ring"
       />
+      <Select value={priority} onValueChange={(v) => setPriority(v ?? "")}>
+        <SelectTrigger className="w-24 h-9 text-xs">
+          <SelectValue placeholder="Priority" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">No priority</SelectItem>
+          <SelectItem value="urgent">Urgent</SelectItem>
+          <SelectItem value="high">High</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="low">Low</SelectItem>
+        </SelectContent>
+      </Select>
       {members.length > 0 && (
         <Select value={assigneeId} onValueChange={(v) => setAssigneeId(v ?? "")}>
           <SelectTrigger className="w-32 h-9 text-xs">

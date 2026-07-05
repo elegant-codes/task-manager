@@ -18,7 +18,7 @@ export function TaskFilters() {
 
   const status = searchParams.get("status") || "";
   const priority = searchParams.get("priority") || "";
-  const view = searchParams.get("view") || "list";
+  const view = searchParams.get("view") || "board";
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -66,22 +66,24 @@ export function TaskFilters() {
 
       <div className="flex-1" />
 
-      <div className="flex items-center border border-border rounded-md">
+      <div className="flex items-center border border-border rounded-md bg-card">
         <Button
           variant={view === "list" ? "secondary" : "ghost"}
           size="sm"
-          className="h-8 px-2 rounded-none rounded-l-md"
+          className="h-8 px-3 rounded-none rounded-l-md font-medium text-xs gap-1.5"
           onClick={() => setView("list")}
         >
           <List className="h-4 w-4" />
+          List
         </Button>
         <Button
           variant={view === "board" ? "secondary" : "ghost"}
           size="sm"
-          className="h-8 px-2 rounded-none rounded-r-md"
+          className="h-8 px-3 rounded-none rounded-r-md font-medium text-xs gap-1.5"
           onClick={() => setView("board")}
         >
           <Columns3 className="h-4 w-4" />
+          Kanban
         </Button>
       </div>
     </div>

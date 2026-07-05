@@ -6,22 +6,27 @@ import { KanbanCard } from "@/components/tasks/kanban-card";
 
 const columnConfig: Record<
   string,
-  { label: string; dot: string; tint: string }
+  { label: string; tint: string }
 > = {
+  backlog: {
+    label: "Backlog",
+    tint: "border-t-muted-foreground/40",
+  },
   todo: {
     label: "To Do",
-    dot: "bg-status-todo",
-    tint: "bg-status-todo/5",
+    tint: "border-t-status-text-todo",
   },
   in_progress: {
     label: "In Progress",
-    dot: "bg-status-in-progress",
-    tint: "bg-status-in-progress/5",
+    tint: "border-t-status-text-in-progress",
   },
   done: {
     label: "Done",
-    dot: "bg-status-done",
-    tint: "bg-status-done/5",
+    tint: "border-t-status-text-done",
+  },
+  archived: {
+    label: "Archived",
+    tint: "border-t-status-text-archived",
   },
 };
 
@@ -39,27 +44,25 @@ export function KanbanColumn({
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const config = columnConfig[status] ?? {
     label: status,
-    dot: "bg-muted-foreground",
-    tint: "",
+    tint: "border-t-muted-foreground",
   };
 
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-w-[280px] rounded-lg border border-border bg-card/40 transition-colors duration-150 ${
-        isOver ? "bg-secondary/60" : ""
-      } ${config.tint}`}
+      className={`flex-1 min-w-[300px] rounded-md border border-border bg-secondary/30 transition-all duration-200 border-t-2 ${config.tint} ${
+        isOver ? "ring-2 ring-primary/50 shadow-md bg-secondary/50" : ""
+      }`}
     >
-      <div className="flex items-center gap-2 p-3 border-b border-border">
-        <span className={`h-2 w-2 rounded-full ${config.dot}`} />
+      <div className="flex items-center justify-between p-3.5 border-b border-border/50">
         <h3 className="font-semibold text-sm text-card-foreground">
           {config.label}
         </h3>
-        <span className="text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-full ml-auto">
+        <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
           {tasks.length}
         </span>
       </div>
-      <div className="p-2 space-y-2 min-h-[200px]">
+      <div className="p-2.5 space-y-2.5 min-h-[200px]">
         {tasks.map((task) => (
           <KanbanCard key={task.id} task={task} members={members} />
         ))}

@@ -24,8 +24,15 @@ export default async function ProjectPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{project.name}</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            {project.name}
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Active Project
+          </p>
+        </div>
         <InviteMemberDialog projectId={project.id} />
       </div>
       <Suspense fallback={null}>

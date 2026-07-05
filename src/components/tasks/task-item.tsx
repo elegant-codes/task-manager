@@ -3,6 +3,7 @@
 import type { TaskRow } from "@/actions/tasks";
 import { deleteTask, updateTask } from "@/actions/tasks";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { PriorityBadge } from "@/components/ui/priority-badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -23,21 +24,6 @@ import { MoreHorizontal, Trash2, User } from "lucide-react";
 import { toast } from "sonner";
 
 type Member = { id: string; name: string };
-
-function PriorityDot({ priority }: { priority: string }) {
-  const colors: Record<string, string> = {
-    urgent: "bg-priority-urgent",
-    high: "bg-priority-high",
-    medium: "bg-priority-medium",
-    low: "bg-priority-low",
-  };
-  if (priority === "none") return null;
-  return (
-    <span
-      className={`h-2 w-2 rounded-full ${colors[priority] ?? "bg-muted-foreground"}`}
-    />
-  );
-}
 
 export function TaskItem({
   task,
@@ -86,36 +72,30 @@ export function TaskItem({
   }
 
   return (
-    <div className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 transition-all duration-150 hover:shadow-elevated hover:-translate-y-0.5">
-      <PriorityDot priority={task.priority} />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-card-foreground truncate">
-          {task.title}
-        </p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <StatusBadge status={task.status} />
-          {assignee && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <User className="h-3 w-3" />
-              {assignee.name}
-            </span>
-          )}
+    <div className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded border border-border/80 bg-card p-3 transition-all duration-100 shadow-card hover:shadow-elevated">
+      <div className="flex items-center gap-3 lg:gap-4 min-w-0">
+        <div className="flex flex-col gap-1.5">
+          <p className="text-[14px] font-semibold text-foreground truncate">
+            {task.title}
+          </p>
+          <div className="flex items-center gap-2">
+            <PriorityBadge priority={task.priority} />
+            <StatusBadge status={task.status} />
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
         {assignee ? (
           <Avatar className="h-7 w-7 ring-2 ring-border">
-            <AvatarFallback className="text-[10px] bg-secondary text-muted-foreground">
+            <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
               {assignee.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         ) : (
-          <Avatar className="h-7 w-7 ring-2 ring-border opacity-50">
-            <AvatarFallback className="text-[10px] bg-secondary text-muted-foreground">
-              <User className="h-3 w-3" />
-            </AvatarFallback>
-          </Avatar>
+          <div className="h-7 w-7 rounded-full border border-dashed border-border flex items-center justify-center text-muted-foreground bg-secondary/30">
+            <User className="h-3 w-3 opacity-50" />
+          </div>
         )}
 
         <Select value={task.status} onValueChange={handleStatusChange}>

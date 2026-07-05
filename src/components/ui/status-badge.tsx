@@ -1,43 +1,51 @@
+import { Circle, CircleDashed, CheckCircle2, Clock, Archive } from "lucide-react";
+
 const statusConfig: Record<
   string,
-  { label: string; dot: string; bg: string }
+  { label: string; icon: React.ElementType; colorClass: string; bgClass: string }
 > = {
   backlog: {
     label: "Backlog",
-    dot: "bg-status-backlog",
-    bg: "bg-status-backlog/10 text-status-backlog",
+    icon: CircleDashed,
+    colorClass: "text-status-text-backlog",
+    bgClass: "bg-status-backlog",
   },
   todo: {
     label: "To Do",
-    dot: "bg-status-todo",
-    bg: "bg-status-todo/10 text-status-todo",
+    icon: Circle,
+    colorClass: "text-status-text-todo",
+    bgClass: "bg-status-todo",
   },
   in_progress: {
     label: "In Progress",
-    dot: "bg-status-in-progress",
-    bg: "bg-status-in-progress/10 text-status-in-progress",
+    icon: Clock,
+    colorClass: "text-status-text-in-progress",
+    bgClass: "bg-status-in-progress",
   },
   done: {
     label: "Done",
-    dot: "bg-status-done",
-    bg: "bg-status-done/10 text-status-done",
+    icon: CheckCircle2,
+    colorClass: "text-status-text-done",
+    bgClass: "bg-status-done",
   },
   archived: {
     label: "Archived",
-    dot: "bg-status-archived",
-    bg: "bg-status-archived/10 text-status-archived",
+    icon: Archive,
+    colorClass: "text-status-text-archived",
+    bgClass: "bg-status-archived",
   },
 };
 
 export function StatusBadge({ status }: { status: string }) {
   const config = statusConfig[status] ?? statusConfig.backlog;
+  const Icon = config.icon;
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium leading-4 ${config.bg}`}
+    <div
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${config.bgClass} ${config.colorClass} transition-colors`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
-      {config.label}
-    </span>
+      <Icon className="w-3 h-3" />
+      <span>{config.label}</span>
+    </div>
   );
 }

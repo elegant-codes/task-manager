@@ -65,6 +65,8 @@ export function TaskList({
   useRealtimeTasks(projectId, setTasks);
   useRealtimeTaskMembers(projectId, fetchMembers);
 
+  const effectiveView = filters.view || "board";
+
   const filteredTasks = tasks.filter((task) => {
     if (filters.status && task.status !== filters.status) return false;
     if (filters.priority && task.priority !== filters.priority) return false;
@@ -84,7 +86,7 @@ export function TaskList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <CreateTaskForm
           projectId={projectId}
           projectSlug={projectSlug}
@@ -92,7 +94,7 @@ export function TaskList({
         />
         <Dialog>
           <DialogTrigger
-            render={<Button variant="outline" size="sm" className="gap-2" />}
+            render={<Button variant="outline" size="sm" className="gap-2 self-end sm:self-auto" />}
           >
             <Users className="h-4 w-4" />
             {members.length}
@@ -117,7 +119,13 @@ export function TaskList({
         </Dialog>
       </div>
 
-      {filters.view === "board" ? (
+      <div className="flex items-center gap-2 text-xs text-muted-foreground px-1">
+        <span className="font-medium">{tasks.length} task{tasks.length !== 1 ? "s" : ""}</span>
+        {filters.status && <span>· filtered by {filters.status.replace("_", " ")}</span>}
+        {filters.priority && <span>· {filters.priority} priority</span>}
+      </div>
+
+      {effectiveView === "board" ? (
         tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <svg
